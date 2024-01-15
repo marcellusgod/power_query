@@ -1,19 +1,19 @@
 let
-	dataInicial = Date.From(Date.StartOfMonth(Date.AddMonths(DateTime.LocalNow(),-1))),
-	dataFinal = DateTime.LocalNow() , 
-	duracao = Duration.TotalHours(dataFinal -dataInicial),
+	dataInicial = Date.StartOfMonth(Date.AddMonths(DateTime.LocalNow(),-15)),
+	dataFinal = DateTime.LocalNow(), 
+	duracao = Duration.TotalHours(dataFinal - dataInicial),
 	Fonte = Table.TransformColumnTypes(
 		Table.RenameColumns(
 			Table.FromList(
-				List.DateTimes(dataInicial, duracao, #duration(0,1,0,0)),
+				List.DateTimes(dataInicial, duracao, #duration(1,0,0,0)),
 				Splitter.SplitByNothing(), 
 				null,
 				null,
 				ExtraValues.Error
 			),
-			{"Columnl", "Data"}
+			{"Column1", "Data"}
 		),
-		{"Data", type datetime} 
+		{"Data", type date} 
 	),
 	dia = Table.AddColumn(
 		Fonte, 
@@ -24,7 +24,7 @@ let
 	mes = Table.AddColumn( 
 		dia, 
 		"Mes", 
-		each Date.Day([Data]),
+		each Date.Month([Data]),
 		Int64.Type
 	),
 	ano = Table.AddColumn( 
@@ -46,11 +46,13 @@ let
 		type text
 	),
 	numDia = Table.AddColumn(
+		nomeMes,
 		"N° dia", 
 		each Date.DayOfWeek([Data], Day.Sunday) + 1, 
 		Int64.Type 
 	),
 	mes_ano = Table.AddColumn(
+		numDia,
 		"Mes Ano",
 		each 
 			if [Mes] < 10 then 
